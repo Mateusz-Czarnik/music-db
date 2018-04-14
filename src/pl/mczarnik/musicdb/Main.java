@@ -24,6 +24,7 @@ public class Main {
             System.out.println("ID = " + artist.getId() + ", Name = " + artist.getName());
         }
 
+        // Close datasource
         datasource.close();
     }
 }
