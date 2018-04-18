@@ -45,6 +45,8 @@ public class Main {
 
         datasource.querySongsMetadata();
 
+        datasource.createViewForSongArtist();
+
         // Close datasource
         datasource.close();
     }
