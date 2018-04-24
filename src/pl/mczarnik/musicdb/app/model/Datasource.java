@@ -1,6 +1,6 @@
-package pl.mczarnik.musicdb.model;
+package pl.mczarnik.musicdb.app.model;
 
-import java.security.PublicKey;
+import javax.xml.crypto.Data;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -112,8 +112,20 @@ public class Datasource {
     private PreparedStatement queryArtist;
     private PreparedStatement queryAlbum;
 
+    // instantiate Datasource singleton in thread safe way
+    private static Datasource instance = new Datasource();
+
+    private Datasource() {
+
+    }
+
+    public static Datasource getInstance() {
+        return instance;
+    }
+
     public boolean open() {
         try {
+            System.out.println();
             conn = DriverManager.getConnection(CONNECTION_STRING);
             // Setup prepared statements for use in open method to make them available when class runs
             querySongInfoView = conn.prepareStatement(QUERY_VIEW_SONG_INFO_PREP);
@@ -233,42 +245,6 @@ public class Datasource {
         }
     }
 
-    public List<SongArtist> queryArtistsForSong(String songName, int sortOrder) {
-
-        StringBuilder sb = new StringBuilder(QUERY_ARTIST_fOR_SONG_START);
-        sb.append(songName);
-        sb.append("\"");
-
-        if (sortOrder != ORDER_BY_NONE) {
-            sb.append(QUERY_ARTIST_FOR_SONG_SORT);
-            if (sortOrder == ORDER_BY_DESC) {
-                sb.append("DESC");
-            } else {
-                sb.append("ASC");
-            }
-        }
-
-        System.out.println("SQL statement = " + sb.toString());
-
-        try (Statement statement = conn.createStatement();
-             ResultSet results = statement.executeQuery(sb.toString())) {
-            List<SongArtist> songArtists = new ArrayList<>();
-
-            while (results.next()) {
-                SongArtist songArtist = new SongArtist();
-                songArtist.setArtistName(results.getString(1));
-                songArtist.setAlbumName(results.getString(2));
-                songArtist.setTrack(results.getInt(3));
-                songArtists.add(songArtist);
-            }
-
-            return songArtists;
-        } catch (SQLException e) {
-            System.out.println("Query failed: " + e.getMessage());
-            return null;
-        }
-    }
-
     public void querySongsMetadata() {
         String sql = "SELECT * FROM " + TABLE_SONGS;
 
@@ -294,29 +270,6 @@ public class Datasource {
         } catch (SQLException e) {
             System.out.println("Create View failed: " + e.getMessage());
             return false;
-        }
-    }
-
-    public List<SongArtist> querySongInfoView(String title) {
-
-        try {
-            querySongInfoView.setString(1, title);
-            ResultSet results = querySongInfoView.executeQuery();
-
-            List<SongArtist> songArtists = new ArrayList<>();
-
-            while (results.next()) {
-                SongArtist songArtist = new SongArtist();
-                songArtist.setArtistName(results.getString(1));
-                songArtist.setAlbumName(results.getString(2));
-                songArtist.setTrack(results.getInt(3));
-                songArtists.add(songArtist);
-            }
-            return songArtists;
-
-        } catch (SQLException e) {
-            System.out.println("Query failed: " + e.getMessage());
-            return null;
         }
     }
 
@@ -388,7 +341,7 @@ public class Datasource {
                 throw new SQLException("Couldn't insert song!");
             }
 
-        } catch (SQLException e) {
+        } catch (Exception e) {
             System.out.println("Insert song exception " + e.getMessage());
             try {
                 System.out.println("Performing rollback");

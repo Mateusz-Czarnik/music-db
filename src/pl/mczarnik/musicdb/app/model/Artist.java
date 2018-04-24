@@ -1,10 +1,9 @@
-package pl.mczarnik.musicdb.model;
+package pl.mczarnik.musicdb.app.model;
 
-public class Album {
+public class Artist {
 
     private int id;
     private String name;
-    private int artistId;
 
     public int getId() {
         return id;
@@ -20,13 +19,5 @@ public class Album {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public int getArtistId() {
-        return artistId;
-    }
-
-    public void setArtistId(int artistId) {
-        this.artistId = artistId;
     }
 }
