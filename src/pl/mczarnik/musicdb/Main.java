@@ -1,4 +1,4 @@
-package pl.mczarnik.musicdb.app;
+package pl.mczarnik.musicdb;
 
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -6,13 +6,16 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import pl.mczarnik.musicdb.app.model.Datasource;
+import pl.mczarnik.musicdb.model.Datasource;
 
 public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        Parent root = FXMLLoader.load(getClass().getResource("main.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("main.fxml"));
+        Parent root = loader.load();
+        Controller controller = loader.getController();
+        controller.listArtists();
         primaryStage.setTitle("Music Database");
         primaryStage.setScene(new Scene(root, 800, 600));
         primaryStage.show();
